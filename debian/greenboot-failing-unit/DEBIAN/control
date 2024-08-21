@@ -1,0 +1,11 @@
+Package: greenboot-failing-unit
+Source: greenboot
+Version: 0.0.1
+Architecture: amd64
+Maintainer: Christian Glombek <lorbus@fedoraproject.org>
+Installed-Size: 12
+Depends: systemd (>= 240), grub-common
+Section: admin
+Priority: optional
+Homepage: https://github.com/fedora-iot/greenboot
+Description: Failing healthcheck unit for testing greenboot red status.

@@ -1,0 +1,6 @@
+usr/libexec/greenboot
+usr/lib/motd.d/boot-status
+usr/lib/systemd/system/*
+usr/lib/tmpfiles.d/*
+usr/lib/greenboot/*
+etc/greenboot/greenboot.conf

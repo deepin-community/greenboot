@@ -1,0 +1,19 @@
+# Automatically added by dh_installsystemd/13.3.3~bpo10+1
+if [ -d /run/systemd/system ] && [ "$1" = remove ]; then
+	systemctl --system daemon-reload >/dev/null || true
+fi
+# End automatically added section
+# Automatically added by dh_installsystemd/13.3.3~bpo10+1
+if [ "$1" = "remove" ]; then
+	if [ -x "/usr/bin/deb-systemd-helper" ]; then
+		deb-systemd-helper mask 'greenboot-grub2-set-counter.service' 'greenboot-grub2-set-success.service' 'greenboot-healthcheck.service' 'greenboot-loading-message.service' 'greenboot-ostree-grub2-check-fallback.service' 'greenboot-status.service' 'greenboot-task-runner.service' 'redboot-auto-reboot.service' 'redboot-task-runner.service' >/dev/null || true
+	fi
+fi
+
+if [ "$1" = "purge" ]; then
+	if [ -x "/usr/bin/deb-systemd-helper" ]; then
+		deb-systemd-helper purge 'greenboot-grub2-set-counter.service' 'greenboot-grub2-set-success.service' 'greenboot-healthcheck.service' 'greenboot-loading-message.service' 'greenboot-ostree-grub2-check-fallback.service' 'greenboot-status.service' 'greenboot-task-runner.service' 'redboot-auto-reboot.service' 'redboot-task-runner.service' >/dev/null || true
+		deb-systemd-helper unmask 'greenboot-grub2-set-counter.service' 'greenboot-grub2-set-success.service' 'greenboot-healthcheck.service' 'greenboot-loading-message.service' 'greenboot-ostree-grub2-check-fallback.service' 'greenboot-status.service' 'greenboot-task-runner.service' 'redboot-auto-reboot.service' 'redboot-task-runner.service' >/dev/null || true
+	fi
+fi
+# End automatically added section

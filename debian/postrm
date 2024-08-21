@@ -1,0 +1,18 @@
+#!/bin/sh
+
+set -e
+
+if [ "$1" = "remove" ]; then
+    systemctl disable greenboot-healthcheck.service
+    systemctl disable greenboot-loading-message.service
+    systemctl disable greenboot-task-runner.service
+    systemctl disable redboot-task-runner.service
+    systemctl disable redboot.target
+    systemctl disable greenboot-status.service
+    systemctl disable greenboot-grub2-set-counter.service
+    systemctl disable greenboot-grub2-set-success.service
+    systemctl disable greenboot-rpm-ostree-grub2-check-fallback.service
+    systemctl disable redboot-auto-reboot.service
+fi
+
+exit 0
