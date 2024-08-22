@@ -1,3 +1,9 @@
+greenboot (0.15.5-0deepin1) unstable; urgency=low
+
+  - add greenboot on deepin
+
+ -- ssk-wh <fanpengcheng@uniontech.com>  Thur, 22 Aug 2024 15:59:30 +0800
+
 greenboot (0.15.5) unstable; urgency=low
 
   - The 0.15.5 release
