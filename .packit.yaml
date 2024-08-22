@@ -1,0 +1,39 @@
+upstream_project_url: https://github.com/fedora-iot/greenboot
+
+specfile_path: greenboot.spec
+files_to_sync:
+  - greenboot.spec
+  - .packit.yaml
+upstream_package_name: greenboot
+upstream_tag_template: v{version}
+downstream_package_name: greenboot
+
+jobs:
+  - job: copr_build
+    trigger: pull_request
+    targets:
+    - fedora-all
+  
+
+  - job: sync_from_downstream
+    trigger: commit
+
+  - job: propose_downstream
+    trigger: release
+    dist_git_branches:
+      - fedora-all
+
+  - job: tests
+    trigger: pull_request
+    targets:
+      - fedora-all
+
+  - job: koji_build
+    trigger: commit
+    dist_git_branches:
+      - fedora-all
+
+  - job: bodhi_update
+    trigger: commit
+    dist_git_branches:
+      - fedora-all
