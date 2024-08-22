@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+
+systemctl enable greenboot-healthcheck.service
+systemctl enable greenboot-loading-message.service
+systemctl enable greenboot-task-runner.service
+systemctl enable redboot-task-runner.service
+systemctl enable redboot.target
+systemctl enable greenboot-status.service
+systemctl enable greenboot-grub2-set-counter.service
+systemctl enable greenboot-grub2-set-success.service
+systemctl enable greenboot-rpm-ostree-grub2-check-fallback.service
+systemctl enable redboot-auto-reboot.service
+
+exit 0
+

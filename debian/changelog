@@ -1,5 +1,9 @@
-template-repository (1.0-1) unstable; urgency=medium
+greenboot (0.15.5) unstable; urgency=low
 
-  * Initial release
-
- -- Tsic404 <liuheng@deepin.org>  Sat, 28 Jan 2023 13:46:49 +0800
+  - The 0.15.5 release
+  - Auto-detect image type and use correct rollback
+  - Support for read only /boot mount
+  - Warn users of missing disabled healthchecks
+  - Add feature to disable healthchecks
+  
+ -- ssk-wh <fanpengcheng@uniontech.com>  Wed, 19 Jun 2024 11:32:58 +0800

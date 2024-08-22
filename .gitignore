@@ -1,1 +1,8 @@
 **/.vagrant
+debian/.debhelper
+debian/debhelper*
+debian/greenboot/
+debian/greenboot.*
+debian/greenboot-failing-unit/*
+debian/greenboot-failing-unit.substvars
+debian/files
