@@ -1,0 +1,175 @@
+Index: greenboot/development/legacy/README.md
+===================================================================
+--- greenboot.orig/development/legacy/README.md
++++ greenboot/development/legacy/README.md
+@@ -64,7 +64,7 @@ sudo journalctl -b -0 \
+     -u redboot.target
+ 
+ # check grubenv variables
+-sudo grub2-editenv list
++sudo grub-editenv list
+ 
+ # the service that sets boot_success to 1 before reboot should be active:
+ sudo systemctl is-active greenboot-grub2-set-success.service
+@@ -98,7 +98,7 @@ sudo journalctl -b -0 \
+ 
+ # grubenv should contain:
+ # boot_counter=2
+-sudo grub2-editenv list
++sudo grub-editenv list
+ 
+ # the service to set boot_success to 1 before reboot should be inactive (dead):
+ sudo systemctl status greenboot-grub2-set-success.service
+@@ -129,7 +129,7 @@ sudo journalctl -b -0 \
+     -u redboot.target
+ 
+ # grubenv
+-sudo grub2-editenv list
++sudo grub-editenv list
+ 
+ # the service to set boot_success to 1 before reboot should be active again:
+ sudo systemctl status greenboot-grub2-set-success.service
+Index: greenboot/etc/greenboot/greenboot.conf
+===================================================================
+--- greenboot.orig/etc/greenboot/greenboot.conf
++++ greenboot/etc/greenboot/greenboot.conf
+@@ -24,4 +24,6 @@ GREENBOOT_WATCHDOG_CHECK_ENABLED=true
+ ### 	"01_repository_dns_check.sh" 
+ ### 	"02_watchdog.sh"
+ ### )
+-DISABLED_HEALTHCHECKS=()
++DISABLED_HEALTHCHECKS=(
++    "02_watchdog.sh"
++)
+Index: greenboot/tests/check-ostree.yaml
+===================================================================
+--- greenboot.orig/tests/check-ostree.yaml
++++ greenboot/tests/check-ostree.yaml
+@@ -203,7 +203,7 @@
+     - name: grubenv variables should contain boot_success=1
+       block:
+         - name: grubenv variables should contain boot_success=1
+-          command: grub2-editenv list
++          command: grub-editenv list
+           register: result_grubenv
+           become: yes
+ 
+@@ -363,7 +363,7 @@
+     - name: grubenv variables should contain boot_success=1
+       block:
+         - name: grubenv variables should contain boot_success=1
+-          command: grub2-editenv list
++          command: grub-editenv list
+           register: result_grubenv
+           become: yes
+ 
+Index: greenboot/tests/common.bash
+===================================================================
+--- greenboot.orig/tests/common.bash
++++ greenboot/tests/common.bash
+@@ -5,7 +5,7 @@ GREENBOOT_USR_LIB_ROOT_PATH="/usr/lib/gr
+ GREENBOOT_BIN_PATH="$GREENBOOT_USR_ROOT_PATH/greenboot"
+ GRUB2_SET_COUNTER_BIN_PATH="$GREENBOOT_USR_ROOT_PATH/greenboot-grub2-set-counter"
+ RPM_OSTREE_CHECK_FALLBACK_PATH="$GREENBOOT_USR_ROOT_PATH/greenboot-rpm-ostree-grub2-check-fallback"
+-GRUB2_EDITENV=/usr/bin/grub2-editenv
++GRUB2_EDITENV=/usr/bin/grub-editenv
+ 
+ GREENBOOT_DEFAULT_CHECK_PATH="$GREENBOOT_USR_LIB_ROOT_PATH/check"
+ GREENBOOT_ETC_CHECK_PATH="$GREENBOOT_ETC_ROOT_PATH/check"
+Index: greenboot/usr/libexec/greenboot/greenboot-grub2-set-counter
+===================================================================
+--- greenboot.orig/usr/libexec/greenboot/greenboot-grub2-set-counter
++++ greenboot/usr/libexec/greenboot/greenboot-grub2-set-counter
+@@ -20,13 +20,13 @@ fi
+ 
+ remount_boot_rw
+ 
+-if ! /usr/bin/grub2-editenv - set boot_counter="$max_boot_attempts"; then
++if ! /usr/bin/grub-editenv - set boot_counter="$max_boot_attempts"; then
+  # If the first command fails, remount /boot as read-only and exit with failure
+     remount_boot_ro
+     exit 1
+ fi
+ 
+-if ! /usr/bin/grub2-editenv /boot/grub2/grubenv set boot_success=0; then
++if ! /usr/bin/grub-editenv /boot/grub/grubenv set boot_success=0; then
+     # If the first command fails, remount /boot as read-only and exit with failure
+     remount_boot_ro
+     exit 1
+Index: greenboot/usr/libexec/greenboot/greenboot-grub2-set-success
+===================================================================
+--- greenboot.orig/usr/libexec/greenboot/greenboot-grub2-set-success
++++ greenboot/usr/libexec/greenboot/greenboot-grub2-set-success
+@@ -5,14 +5,14 @@ set -eo pipefail
+ source /usr/libexec/greenboot/greenboot-boot-remount
+ remount_boot_rw
+ 
+-# Run the grub2-editenv commands
+-if ! /usr/bin/grub2-editenv /boot/grub2/grubenv set boot_success=1; then
++# Run the grub-editenv commands
++if ! /usr/bin/grub-editenv /boot/grub/grubenv set boot_success=1; then
+     # If the first command fails, remount /boot as read-only and exit with failure
+     remount_boot_ro
+     exit 1
+ fi
+ 
+-if ! /usr/bin/grub2-editenv /boot/grubenv unset boot_counter; then
++if ! /usr/bin/grub-editenv /boot/grub/grubenv unset boot_counter; then
+     # If the second command fails, remount /boot as read-only and exit with failure
+     remount_boot_ro
+     exit 1
+Index: greenboot/usr/libexec/greenboot/greenboot-rpm-ostree-grub2-check-fallback
+===================================================================
+--- greenboot.orig/usr/libexec/greenboot/greenboot-rpm-ostree-grub2-check-fallback
++++ greenboot/usr/libexec/greenboot/greenboot-rpm-ostree-grub2-check-fallback
+@@ -15,7 +15,11 @@ function attempt_rollback {
+   fi
+   # Check if its ostree based os
+   if [ -f /run/ostree-booted ]; then
+-    rpm-ostree rollback
++    ostree admin set-default 1
++    if ! /usr/bin/grub-editenv /boot/grub/grubenv set boot_counter=1; then
++      echo "<3> ERROR DETECTED! Default boot_counter env not set correct."
++      exit 1
++    fi
+     echo "<3>FALLBACK BOOT DETECTED! Default rpm-ostree deployment has been rolled back."
+     return
+   fi
+@@ -25,7 +29,7 @@ function attempt_rollback {
+ 
+ # Determine if the current boot is a fallback boot
+ # If booted into fallback deployment, clean up bootloader entries (rollback)
+-if grub2-editenv list | grep -q "^boot_counter=-1$"; then
++if grub-editenv list | grep -q "^boot_counter=-1$"; then
+   # Logs from previous boot may be unavailable on systems without internal RTC; defaulting to empty string
+   prev_logs="$(journalctl -u greenboot-healthcheck.service -p 2 -b -1 -o cat)" || true
+   attempt_rollback
+@@ -36,7 +40,7 @@ if grub2-editenv list | grep -q "^boot_c
+ 
+ remount_boot_rw
+ 
+-  if ! /usr/bin/grub2-editenv - unset boot_counter; then
++  if ! /usr/bin/grub-editenv - unset boot_counter; then
+     # If the above command fails, remount /boot as read-only and exit with failure
+     remount_boot_ro
+     exit 1
+Index: greenboot/usr/libexec/greenboot/redboot-auto-reboot
+===================================================================
+--- greenboot.orig/usr/libexec/greenboot/redboot-auto-reboot
++++ greenboot/usr/libexec/greenboot/redboot-auto-reboot
+@@ -5,13 +5,13 @@ bootloader_entries=(/boot/loader/entries
+ bootloader_entry_count=${#bootloader_entries[@]}
+ 
+ # If boot_counter is unset, do nothing
+-if ! grub2-editenv list | grep -q "^boot_counter="; then
++if ! grub-editenv list | grep -q "^boot_counter="; then
+   echo "<0>SYSTEM is UNHEALTHY, but boot_counter is unset in grubenv. Manual intervention necessary."
+   exit 1
+ # In case we've booted into our fallback deployment and still don't reach boot-complete.target, do nothing.
+ # This condition will never be reached if greenboot-rpm-ostree-grub2-check-fallback.service
+ # is installed and enabled.
+-elif grub2-editenv list | grep -q "^boot_counter=-1$"; then
++elif grub-editenv list | grep -q "^boot_counter=-1$"; then
+   echo "<0>FALLBACK BOOT DETECTED but SYSTEM is still UNHEALTHY. Manual intervention necessary."
+   exit 2
+ # If we have only one (or less) bootloader entries, don't reboot
