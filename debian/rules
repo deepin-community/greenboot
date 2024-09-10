@@ -2,4 +2,7 @@
 DEB_DESTDIR=debian/greenboot
 
 %:
-	dh $@
+	dh $@ --with-systemd
+
+override_dh_systemd_start:
+	dh_systemd_start --no-start

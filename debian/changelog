@@ -1,4 +1,10 @@
-greenboot (0.15.5-0deepin1) UNRELEASED; urgency=medium
+greenboot (0.15.5-0deepin2) unstable; urgency=medium
+
+  * not start systemd service when installed
+
+ -- ssk-wh <fanpengcheng@uniontech.com>  Tue, 10 Sep 2024 11:12:50 +0800
+
+greenboot (0.15.5-0deepin1) unstable; urgency=medium
 
   * use on deepin.
 
