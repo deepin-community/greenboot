@@ -1,0 +1,15 @@
+Index: greenboot-fork-from-deepin/usr/lib/greenboot/check/wanted.d/01_update_platforms_check.sh
+===================================================================
+--- greenboot-fork-from-deepin.orig/usr/lib/greenboot/check/wanted.d/01_update_platforms_check.sh
++++ greenboot-fork-from-deepin/usr/lib/greenboot/check/wanted.d/01_update_platforms_check.sh
+@@ -7,8 +7,8 @@ URLS_WITH_PROBLEMS=()
+ get_update_platform_urls() {
+     mapfile -t UPDATE_PLATFORM_URLS < <(grep -P -ho 'http[s]?.*' "${REPOS_DIRECTORY}"/*)
+     if [[ ${#UPDATE_PLATFORM_URLS[@]} -eq 0 ]]; then
+-        echo "No update platforms found, this can be a mistake"
+-        exit 1
++        echo "No update platforms found, skipping check"
++        exit 0
+     fi
+ }
+ 

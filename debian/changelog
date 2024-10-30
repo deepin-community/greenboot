@@ -1,3 +1,9 @@
+greenboot (0.15.5-0deepin3) unstable; urgency=medium
+
+  * remove warning about update platforms check
+
+ -- ssk-wh <fanpengcheng@uniontech.com>  Wed, 30 Oct 2024 13:12:35 +0800
+
 greenboot (0.15.5-0deepin2) unstable; urgency=medium
 
   * not start systemd service when installed
